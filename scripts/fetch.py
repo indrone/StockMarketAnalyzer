@@ -1,13 +1,13 @@
 import yfinance as yf
+import matplotlib.pyplot as plt
 
 
-def fetch_historical(ticker):
+def historical(ticker):
     msft = yf.Ticker(ticker)
     hist = msft.history(period="max")
     return hist
 
 
-def get_company_info(ticker):
+def company_info(ticker):
     msft = yf.Ticker(ticker)
     return msft.info
-
