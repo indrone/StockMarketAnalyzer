@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stockipy</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+      <script src="https://cdnjs.com/libraries/Chart.js" type="text"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+  </head>
+  <style>
+      html, body {
+       height: 100%;
+       width: 100%;
+       margin: 0;
+       padding: 0;
+    }
+      .sidebar{
+      height:100vh;
+      padding:40px;
+      padding-top:80px;
+      }
+      li a{
+      color: white;
+      }
+  </style>
+<body>
+<section style="padding:5% 5% 5% 5%">
+    <div class="columns">
+        <div class="column">
+
+        </div>
+        <div class="column">
+
+        </div>
+        <div class="column">
+            <a class="box button" href="/">
+                <--Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+    <h1 class="title">
+        {{info["name"]}}
+    </h1>
+    <!--top Bottons-->
+    <div class="columns">
+        {%if info["timeframe"]==7%}
+        <div class="column">
+             <a class="button is-success" href="?timeframe=7">7 days</a>
+        </div>
+        <div class="column">
+            <a class="button "  href="?timeframe=30">30 days</a>
+        </div>
+        <div class="column">
+            <a class="button"  href="?timeframe=180">6 Months</a>
+        </div>
+        <div class="column">
+            <a class="button" href="?timeframe=365">1 Year</a>
+        </div>
+        <div class="column">
+            <a class="button" href="?timeframe=1825">5 Year</a>
+        </div>
+        {%elif info["timeframe"]==30%}
+        <div class="column">
+             <a class="button" href="?timeframe=7">7 days</a>
+        </div>
+        <div class="column">
+            <a class="button is-success"  href="?timeframe=30">30 days</a>
+        </div>
+
+        <div class="column">
+            <a class="button"  href="?timeframe=180">6 Months</a>
+        </div>
+        <div class="column">
+            <a class="button" href="?timeframe=365">1 Year</a>
+        </div>
+        <div class="column">
+            <a class="button" href="?timeframe=1825">5 Year</a>
+        </div>
+        {%elif info["timeframe"]==180%}
+        <div class="column">
+             <a class="button" href="?timeframe=7">7 days</a>
+        </div>
+        <div class="column">
+            <a class="button"  href="?timeframe=30">30 days</a>
+        </div>
+
+        <div class="column">
+            <a class="button is-success"  href="?timeframe=180">6 Months</a>
+        </div>
+        <div class="column">
+            <a class="button" href="?timeframe=365">1 Year</a>
+        </div>
+        <div class="column">
+            <a class="button" href="?timeframe=1825">5 Year</a>
+        </div>
+        {%elif info["timeframe"]==365%}
+        <div class="column">
+             <a class="button" href="?timeframe=7">7 days</a>
+        </div>
+        <div class="column">
+            <a class="button "  href="?timeframe=30">30 days</a>
+        </div>
+        <div class="column">
+            <a class="button "  href="?timeframe=180">6 Months</a>
+        </div>
+        <div class="column">
+            <a class="button is-success" href="?timeframe=365">1 Year</a>
+        </div>
+        <div class="column">
+            <a class="button" href="?timeframe=1825">5 Year</a>
+        </div>
+        {%elif info["timeframe"]==1825%}
+        <div class="column">
+             <a class="button" href="?timeframe=7">7 days</a>
+        </div>
+        <div class="column">
+            <a class="button "  href="?timeframe=30">30 days</a>
+        </div>
+        <div class="column">
+            <a class="button"  href="?timeframe=180">6 Months</a>
+        </div>
+        <div class="column">
+            <a class="button " href="?timeframe=365">1 Year</a>
+        </div>
+        <div class="column">
+            <a class="button is-success" href="?timeframe=1825">5 Year</a>
+        </div>
+        {%endif%}
+    </div>
+    <hr>
+    <!--end buttons-->
+    <div class="columns">
+        <div class="column" id="bolinBand">
+            <div class="columns">
+                <div class="column">
+                    <a class="button is-primary" onclick="hideAll('bolinBand')" id="bolinBand_hd">Expand</a>
+                </div>
+                <div class="column">
+                    <a class="button is-primary" onclick="showAll()" id="bolinBand_sh" style="display:none">Collapse</a>
+
+                </div>
+                <div class="column">
+                    {%if info["bb"]["signal"]=="BUY"%}
+                        <button class="button is-success">BUY</button>
+                    {%elif info["bb"]["signal"]=="SELL"%}
+                        <button class="button is-danger">SELL</button>
+                    {%elif info["bb"]["signal"]=="STAY"%}
+                        <button class="button is-warning">STAY</button>
+                    {%endif%}
+                </div>
+            </div>
+            <canvas id="bb" width="400" height="200"></canvas>
+        </div>
+        <div class="column" id="macdSignal">
+
+
+            <div class="columns">
+                <div class="column">
+                    <a class="button is-primary" onclick="hideAll('macdSignal')" id="macdSignal_hd">Expand</a>
+                </div>
+                <div class="column">
+                    <a class="button is-primary" onclick="showAll()" id="macdSignal_sh" style="display:none">Collapse</a>
+
+                </div>
+                <div class="column">
+                    {%if info["macd"]["signal"]=="BUY"%}
+                        <button class="button is-success">BUY</button>
+                    {%elif info["macd"]["signal"]=="SELL"%}
+                        <button class="button is-danger">SELL</button>
+                    {%elif info["macd"]["signal"]=="STAY"%}
+                        <button class="button is-warning">STAY</button>
+                    {%endif%}
+                </div>
+            </div>
+            <canvas id="macd" width="400" height="200"></canvas>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column" id="atrSignal">
+            <div class="columns">
+                <div class="column">
+                    <a class="button is-primary" onclick="hideAll('atrSignal')" id="atrSignal_hd">Expand</a>
+                </div>
+                <div class="column">
+                    <a class="button is-primary" onclick="showAll()" id="atrSignal_sh" style="display:none">Collapse</a>
+
+                </div>
+                <div class="column">
+                    {%if info["bb"]["signal"]=="VOLATILE"%}
+                        <button class="button is-success">VOLATILE</button>
+
+                    {%elif info["bb"]["signal"]=="NON-VOLATILE"%}
+                        <button class="button is-warning">NON-VOLATILE</button>
+                    {%endif%}
+                </div>
+            </div>
+            <canvas id="atr" width="400" height="200"></canvas>
+        </div>
+
+    </div>
+</section>
+<script>
+False=false
+info={{info|safe}}
+console.log(info)
+function drawLineChart(idx,dataset,labels,title){
+    var ctx = document.getElementById(idx).getContext('2d');
+    var myLineChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: dataset,
+
+      },
+      options: {
+        title: {
+          display: true,
+          text: title,
+
+
+        }
+      }
+    });
+    return myLineChart
+}
+bb=drawLineChart("bb",info["bb"]["data"],info["bb"]["label"],"BollingerBands Moving Average")
+macd=drawLineChart("macd",info["macd"]["data"],info["macd"]["label"],"MACD")
+atr=drawLineChart("atr",info["atr"]["data"],info["atr"]["label"],"Measure of Volatility")
+
+
+function hideAll(idx){
+    document.getElementById(idx+"_hd").style.display="none"
+    document.getElementById(idx+"_sh").style.display="flex"
+    all_charts=["bolinBand","macdSignal","atrSignal"]
+    for(var i=0;i<all_charts.length;i++){
+        if(all_charts[i]!=idx){
+            document.getElementById(all_charts[i]).style.display="none"
+
+            if (idx=="bolinBand"){
+                bb.destroy();
+                bb=drawLineChart("bb",info["bb"]["data"],info["bb"]["label"],"BollingerBands Moving Average")
+            }
+            else if(idx=="macdSignal"){
+                macd.destroy();
+                macd=drawLineChart("macd",info["macd"]["data"],info["macd"]["label"],"MACD")
+
+            }
+            else if(idx=="atrSignal"){
+                atr.destroy();
+                atr=drawLineChart("atr",info["atr"]["data"],info["atr"]["label"],"Measure of Volatility")
+
+
+            }
+
+
+        }
+    }
+}
+function showAll(){
+ window.location.reload();
+}
+</script>
+  </body>
+</html>

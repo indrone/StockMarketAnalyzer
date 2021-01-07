@@ -1,0 +1,89 @@
+{% extends "header.html" %}
+{% block body %}
+<section style="padding:5% 5% 0% 0%">
+    <div class="columns">
+            <div class="column">
+            </div>
+            <div class="column">
+            </div>
+            <div class="column">
+
+            </div>
+            <div class="column" style="text-align:center">
+                <a class="button" onclick="refresh()"><img src="https://img.icons8.com/office/30/000000/refresh--v2.png"/></a>
+            </div>
+    </div>
+</section>
+<section style="padding:0% 5% 5% 5%">
+    <div class="box">
+        <div class="columns">
+            <div class="column">
+                <p><b>Company Name</b></p>
+            </div>
+            <div class="column">
+                <p><b>Ticker</b></p>
+            </div>
+            <div class="column">
+               <p><b>Buy prc</b></p>
+            </div>
+            <div class="column">
+                <p><b>Quantity</b></p>
+            </div>
+            <div class="column">
+                <p><b>Total</b></p>
+            </div>
+            <div class="column">
+                <p><b>Current prc</b></p>
+            </div>
+            <div class="column">
+                <p><b>Profit/Loss</b></p>
+            </div>
+            <div class="column">
+
+            </div>
+        </div>
+    </div>
+    {%for i in stocks%}
+    <div class="box">
+        <div class="columns">
+            <div class="column">
+                <p>{{i["name"]}}</p>
+            </div>
+            <div class="column">
+                <p>{{i["ticker"]}}</p>
+            </div>
+            <div class="column">
+                <p>{{i["amount"]}}</p>
+            </div>
+            <div class="column">
+                <p>{{i["qty"]}}</p>
+            </div>
+            <div class="column">
+                <p>{{i["total"]}}</p>
+            </div>
+            <div class="column">
+                <p>{{prices[i["ticker"]]["sell"]}}</p>
+            </div>
+            <div class="column">
+                {%if prices[i["ticker"]]["stat"]=="P"%}
+                    <p style="color:green">{{prices[i["ticker"]]["pl"]}}%</p>
+                {%else%}
+                    <p style="color:red">{{prices[i["ticker"]]["pl"]}}%</p>
+                {%endif%}
+            </div>
+            <div class="column">
+                <a class="button is-success" style="padding:10px;" href="/company/{{i['ticker']}}">More</a>
+                <a class="button is-danger" style="padding:2px;"><img src="https://img.icons8.com/fluent/48/000000/delete-forever.png" width="30" height="30"></a>
+            </div>
+        </div>
+
+    </div>
+    {%endfor%}
+
+</section>
+<script>
+    function refresh(){
+        window.location.reload();
+    }
+</script>
+{% endblock %}

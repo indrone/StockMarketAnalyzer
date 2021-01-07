@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
+    <title>Stockipy</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
   </head>
@@ -15,10 +15,9 @@
        padding: 0;
     }
       .sidebar{
-      background-color: #9500ff;
-      height:100%;
-      padding:20px;
-      padding-top:40px;
+      height:100vh;
+      padding:40px;
+      padding-top:80px;
       }
       li a{
       color: white;
@@ -32,20 +31,19 @@
                 General
               </p>
               <ul class="menu-list">
-                <li><a>Dashboard</a></li>
-                <li><a>Customers</a></li>
+                <li><a href="/">Dashboard</a></li>
+
               </ul>
               <p class="menu-label">
-                Administration
+                Portfolio
               </p>
               <ul class="menu-list">
-                <li><a>Team Settings</a></li>
+                <li><a>Portfolio Manager</a></li>
                 <li>
-                  <a class="is-active">Manage Your Team</a>
+                  <a class="is-active">Manage Your Portfolio</a>
                   <ul>
-                    <li><a>Members</a></li>
-                    <li><a>Plugins</a></li>
-                    <li><a>Add a member</a></li>
+                    <li><a href="/addPortfolio/">Add New Company</a></li>
+
                   </ul>
                 </li>
                 <li><a>Invitations</a></li>
@@ -63,7 +61,8 @@
             </aside>
           </div>
           <div class="column is-9">
-
+                {% block body %}
+                {% endblock %}
           </div>
       </div>
   </body>
