@@ -190,17 +190,36 @@
 
                 </div>
                 <div class="column">
-                    {%if info["bb"]["signal"]=="VOLATILE"%}
-                        <button class="button is-success">VOLATILE</button>
+                    {%if info["atr"]["signal"]=="VOLATILE"%}
+                        <button class="button is-danger">VOLATILE</button>
 
-                    {%elif info["bb"]["signal"]=="NON-VOLATILE"%}
+                    {%elif info["atr"]["signal"]=="NON-VOLATILE"%}
                         <button class="button is-warning">NON-VOLATILE</button>
                     {%endif%}
                 </div>
             </div>
             <canvas id="atr" width="400" height="200"></canvas>
         </div>
+        <div class="column" id="rsiSignal">
+            <div class="columns">
+                <div class="column">
+                    <a class="button is-primary" onclick="hideAll('rsiSignal')" id="rsiSignal_hd">Expand</a>
+                </div>
+                <div class="column">
+                    <a class="button is-primary" onclick="showAll()" id="rsiSignal_sh" style="display:none">Collapse</a>
 
+                </div>
+                <div class="column">
+                    {%if info["atr"]["signal"]=="VOLATILE"%}
+                        <button class="button is-danger">VOLATILE</button>
+
+                    {%elif info["atr"]["signal"]=="NON-VOLATILE"%}
+                        <button class="button is-warning">NON-VOLATILE</button>
+                    {%endif%}
+                </div>
+            </div>
+            <canvas id="rsi" width="400" height="200"></canvas>
+        </div>
     </div>
 </section>
 <script>
@@ -230,12 +249,12 @@ function drawLineChart(idx,dataset,labels,title){
 bb=drawLineChart("bb",info["bb"]["data"],info["bb"]["label"],"BollingerBands Moving Average")
 macd=drawLineChart("macd",info["macd"]["data"],info["macd"]["label"],"MACD")
 atr=drawLineChart("atr",info["atr"]["data"],info["atr"]["label"],"Measure of Volatility")
-
+rsi=drawLineChart("rsi",info["rsi"]["data"],info["rsi"]["label"],"Relative strength Index")
 
 function hideAll(idx){
     document.getElementById(idx+"_hd").style.display="none"
     document.getElementById(idx+"_sh").style.display="flex"
-    all_charts=["bolinBand","macdSignal","atrSignal"]
+    all_charts=["bolinBand","macdSignal","atrSignal","rsiSignal"]
     for(var i=0;i<all_charts.length;i++){
         if(all_charts[i]!=idx){
             document.getElementById(all_charts[i]).style.display="none"

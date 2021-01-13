@@ -32,7 +32,7 @@ def company_info(ticker):
     return msft.info
 
 
-def profit(qty,buy,sell):
+def profit(buy,sell,qty=1):
     qty=int(qty)
     buy=float(buy)
     return round((((sell*qty)-(buy*qty))/(buy*qty))*100,2)

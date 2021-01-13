@@ -15,7 +15,7 @@
     </div>
     {%if show==True%}
     <div>
-        <a class="button is-primary" href="/company/{{name}}">Stats</a>
+
         <div class="columns">
             <div class="column">
                 <div class="field">
@@ -44,8 +44,13 @@
                 </div>
             </div>
             <div class="column">
-                <div style="padding-top:10%">
+                <div style="padding-top:15%">
                     <a class="button is-dark" onclick="saveOrder()">Save</a>
+                </div>
+            </div>
+            <div class="column">
+                <div style="padding-top:15%">
+                    <a class="button is-primary" href="/company/{{name}}">Check Stats</a>
                 </div>
             </div>
         </div>

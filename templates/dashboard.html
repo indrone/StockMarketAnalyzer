@@ -1,5 +1,12 @@
 {% extends "header.html" %}
 {% block body %}
+<style>
+    .wrap{
+       -webkit-box-shadow: 2px 4px 32px -14px rgba(0,0,0,0.75);
+-moz-box-shadow: 2px 4px 32px -14px rgba(0,0,0,0.75);
+box-shadow: 2px 4px 32px -14px rgba(0,0,0,0.75);
+    }
+</style>
 <section style="padding:5% 5% 0% 0%">
     <div class="columns">
             <div class="column">
@@ -14,6 +21,7 @@
             </div>
     </div>
 </section>
+
 <section style="padding:0% 5% 5% 5%">
     <div class="box">
         <div class="columns">
@@ -80,6 +88,44 @@
     </div>
     {%endfor%}
 
+</section>
+<section style="padding:5% 5% 0% 0%">
+    <h1 class="title" style="text-align:center">TOP GAINERS</h1>
+    {%for gain in gainers%}
+    <div class="columns">
+        {%for i in gain%}
+        <div class="column wrap">
+            <h2><a href="/addPortfolio/?ticker={{i['ticker']}}">{{i["ticker"]}}</a></h2>
+            <h5>Current:Rs.{{i["price"]}}</h5>
+            {%if i["stat"]=="P"%}
+                    <p style="color:green">{{i["pl"]}}%</p>
+                {%else%}
+                    <p style="color:red">{{i["pl"]}}%</p>
+            {%endif%}
+        </div>
+        {%endfor%}
+    </div>
+    {%endfor%}
+</section>
+<section style="padding:5% 5% 5% 0%">
+    <h1 class="title" style="text-align:center">TOP LOSERS</h1>
+    {%for gain in losers%}
+    <div class="columns">
+
+        {%for i in gain%}
+        <div class="column wrap">
+            <h2><a href="/addPortfolio/?ticker={{i['ticker']}}">{{i["ticker"]}}</a></h2>
+            <h5>Current:Rs.{{i["price"]}}</h5>
+
+            {%if gain["stat"]=="P"%}
+                    <p style="color:green">{{i["pl"]}}%</p>
+                {%else%}
+                    <p style="color:red">{{i["pl"]}}%</p>
+            {%endif%}
+        </div>
+        {%endfor%}
+    </div>
+    {%endfor%}
 </section>
 <script>
     function refresh(){

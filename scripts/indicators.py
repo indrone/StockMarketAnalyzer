@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 
 def getBolingerBands(df,n=20,dropna=False):
     df = df.copy()
@@ -40,3 +40,37 @@ def dailyATR(data):
     data = data.copy()
     data["dailyATR"]=data["ATR"]-data["ATR"].shift(1)
     return data.dropna()
+
+def RSI(data,period=14,dropna=False):
+    # Overbought=80-->Sell Time
+    # OverSold=20 --->Buy Time
+    # RSI is the Relative Profit/Loss over a period of time
+    # Relative Strength Index
+    ## ADJ close today-previous day
+    data["delta"]=data["Close"]-data["Close"].shift(1)
+    data["gain"]=np.where(data["delta"]>=0,data["delta"],0)
+    data["loss"]=np.where(data["delta"]<0,abs(data["delta"]),0)
+    #
+    gain=data["gain"].tolist()
+    loss=data["loss"].tolist()
+
+    avg_gain=[]
+    avg_loss=[]
+    for i in range(len(data)):
+        if i<period:
+            avg_gain.append(np.NaN)
+            avg_loss.append(np.NaN)
+        elif i==period:
+            avg_gain.append(data["gain"].rolling(period).mean().tolist()[period])
+            avg_loss.append(data["loss"].rolling(period).mean().tolist()[period])
+        elif i>period:
+            avg_gain.append(((period-1)*avg_gain[i-1]+gain[i])/period)
+            avg_loss.append(((period-1)*avg_loss[i-1]+loss[i])/period)
+    data["avg_gain"]=np.array(avg_gain)
+    data["avg_loss"]=np.array(avg_loss)
+    data["RS"]=data["avg_gain"]/data["avg_loss"]
+    data["RSI"]=100-(100/(1+data["RS"]))
+    data.drop(["avg_gain","avg_loss","gain","loss","delta","RS"],axis=1,inplace=True)
+    if dropna:
+        data=data.dropna()
+    return data
