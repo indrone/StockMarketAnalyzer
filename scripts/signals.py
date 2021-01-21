@@ -30,6 +30,13 @@ def getBuySellMACD(df):
     k = list(counter.keys())
 
     return k[v.index(max(v))]
+def getBuySellRSI(df):
+    counter = df["rsiSignal"].value_counts().to_dict()
+    v = list(counter.values())
+
+    # taking list of car keys in v
+    k = list(counter.keys())
+    return k[v.index(max(v))]
 
 
 def bolingerBandsSingal(df,threshold=1):
@@ -68,4 +75,10 @@ def volatility(df):
 def ATRSingnal(df,threshold=0):
     df = df.copy()
     df["atrSignal"]=np.where(df["dailyATR"]<threshold,"NEG","POS")
+    return df
+
+def RSISignal(df,up=80,down=20):
+    df = df.copy()
+    df["rsiSignal"]=np.where(df["RSI"]>=up,"SELL","STAY")
+    df["rsiSignal"] = np.where((df["RSI"] <= down) &(df["rsiSignal"]!="SELL") , "BUY", "STAY")
     return df

@@ -1,4 +1,66 @@
 {% extends "header.html" %}
 {% block body %}
+<section style="padding:5% 5% 5% 5%">
+    <div class="columns">
+        <div class="column">
+            <div class="select">
+              <select>
+                <option>Select dropdown</option>
+                <option>With options</option>
+              </select>
+            </div>
+        </div>
+        <div class="column">
 
+        </div>
+        <div class="column">
+
+        </div>
+    </div>
+    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+    <thead>
+    <tr>
+        <th> Company</th>
+        <th> Industry</th>
+        <th> Price </th>
+        <th> Price Change </th>
+    </tr>
+    </thead>
+        <tbody>
+        {% for i in company%}
+            <tr>
+                <td> <a href="/addPortfolio/?ticker={{i['ticker']}}">{{i["company"]}}</a></td>
+                <td> {{i["indus"]}}</td>
+                <td> {{i["price"]}} </td>
+                <td> {{i["change"]}} </td>
+            </tr>
+        {% endfor%}
+
+        </tbody>
+    </table>
+    <nav class="pagination is-small" role="navigation" aria-label="pagination">
+      <a class="pagination-previous" href="/showStocks/?page={{info['prev']}}">Previous</a>
+      <a class="pagination-next" href="/showStocks/?page={{info['next']}}">Next page</a>
+      <ul class="pagination-list">
+          {%if info['current']>=3%}
+          <li><a class="pagination-link" aria-label="Goto page 1" href="/showStocks/?page=1">1</a></li>
+            <li><span class="pagination-ellipsis">&hellip;</span></li>
+          {%endif%}
+          {%if info['prev']!=0%}
+        <li><a class="pagination-link" aria-label="Goto page 45" href="/showStocks/?page={{info['prev']}}">{{info['prev']}}</a></li>
+          {%endif%}
+        <li><a class="pagination-link is-current" aria-label="Page 46" aria-current="page" href="/showStocks/?page={{info['current']}}">{{info['current']}}</a></li>
+          {%if info['current']!=info['last']%}
+        <li><a class="pagination-link" aria-label="Goto page 47" href="/showStocks/?page={{info['next']}}">{{info['next']}}</a></li>
+          {%endif%}
+          {%if info['prev']==0%}
+           <li><a class="pagination-link" aria-label="Goto page 47" href="/showStocks/?page={{info['next']+1}}">{{info['next']+1}}</a></li>
+          {%endif%}
+          {%if info['current']!=info['last'] and info['current']!=info['last']-1%}
+        <li><span class="pagination-ellipsis">&hellip;</span></li>
+        <li><a class="pagination-link" aria-label="Goto page 86" href="/showStocks/?page={{info['last']}}">{{info['last']}}</a></li>
+          {%endif%}
+      </ul>
+    </nav>
+</section>
 {% endblock %}

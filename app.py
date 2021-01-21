@@ -7,12 +7,13 @@ from flask import Flask,render_template,request,redirect,url_for
 import os
 from nsetools import Nse
 
+
 app=Flask(__name__)
 
 portfolio=os.getcwd()+"/static/DB/portfolio.json"
-allcompany=os.getcwd()+"/static/DB/allcompany.json"
+allcompany=os.getcwd()+"/static/DB/allcompany_withnames.json"
 nse = Nse()
-
+#fetch.save_All_StockCodes()
 @app.route("/",methods=["GET","POST"])
 def index():
     all_portfolio=DB.get_all(portfolio)
@@ -34,9 +35,7 @@ def index():
     return render_template("dashboard.html",stocks=all_portfolio,prices=current_prices,losers=[losers[:5],losers[5:]],gainers=[gainers[:5],gainers[5:]])
 
 
-def get_company_name(details):
-    upto_provide=details.index("provides")
-    return details[:upto_provide]
+
 
 
 @app.route("/company/<name>")
@@ -57,12 +56,14 @@ def company(name):
     datr=indicators.dailyATR(atr)
     atrs=signals.ATRSingnal(datr)
     atrs=signals.volatility(atrs.tail(7))
-    print(atrs)
+    
     #Relative strength index
     rsi=indicators.RSI(hist,dropna=True)
     rsi["overbought"]=80
     rsi["oversold"] = 20
-    print(rsi)
+    rsi=signals.RSISignal(rsi)
+    rsiSignal=signals.getBuySellRSI(rsi.tail())
+    print(rsiSignal)
     if "timeframe" in request.args:
         timeframe=int(request.args["timeframe"])
 
@@ -115,7 +116,7 @@ def company(name):
                           "overbought":list(rsi["overbought"].values),
                           "oversold": list(rsi["oversold"].values)
                       }),
-                  "signal": atrs
+                  "signal": rsiSignal
               }
 
           }
@@ -132,14 +133,14 @@ def add_portfolio():
         ticker = request.args["ticker"]
         info = fetch.company_info(ticker)
         company_name = info["longBusinessSummary"]
-        info["companyName"] = get_company_name(company_name)
+        info["companyName"] = fetch.get_company_name(company_name)
         name = ticker
         show = True
     if request.method == "POST":
         ticker=request.form["ticker"]
         info=fetch.company_info(ticker)
         company_name=info["longBusinessSummary"]
-        info["companyName"]=get_company_name(company_name)
+        info["companyName"]=fetch.get_company_name(company_name)
         name=ticker
         show=True
 
@@ -149,24 +150,36 @@ def add_portfolio():
 @app.route("/showStocks/",methods=["GET","POST"])
 def showStocks():
 
-    return render_template("showStocks.html")
-def save_All_StockCodes():
-    all_stock_codes = nse.get_stock_codes()
-    stock = list(all_stock_codes.keys())
-    sector_wise_list = {}
-    exceptions = []
-    for i in stock[1:]:
-        print(i)
+    company=DB.get_all(allcompany)[0]
+    details=[]
+    codes=[]
+    page=1
+    if "page" in request.args:
+        page=int(request.args["page"])
+    perpage=20
+    c=0
+    for i in company:
+        #print(company[i])
+        codes.extend(company[i])
+
+    #print(codes)
+
+    for i in codes[(page-1)*perpage:page*perpage]:
         try:
-            sector = fetch.company_info(i + ".NS")["sector"]
-            if sector in sector_wise_list:
-                sector_wise_list[sector].append(i + ".NS")
-            else:
-                sector_wise_list[sector] = [i + ".NS"]
+            data=nse.get_quote(i["ticker"].strip(".NS"))
         except:
-            print("Error", i)
-            exceptions.append(i)
-    DB.insert(allcompany, sector_wise_list)
+            continue
+        if data ==None:
+            continue
+        i["price"]=data["lastPrice"]
+        i["change"] = data["change"]
+        details.append(i)
+    print(details)
+    info={"current":page,"next":page+1,"prev":page-1,"last":int(len(codes)/perpage)+1}
+    return render_template("showStocks.html",company=details,info=info)
+
+
+
 
 @app.route("/saveOrder/",methods=["GET","POST"])
 def save_order():

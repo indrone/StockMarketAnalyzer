@@ -210,11 +210,12 @@
 
                 </div>
                 <div class="column">
-                    {%if info["atr"]["signal"]=="VOLATILE"%}
-                        <button class="button is-danger">VOLATILE</button>
-
-                    {%elif info["atr"]["signal"]=="NON-VOLATILE"%}
-                        <button class="button is-warning">NON-VOLATILE</button>
+                     {%if info["rsi"]["signal"]=="BUY"%}
+                        <button class="button is-success">BUY</button>
+                    {%elif info["rsi"]["signal"]=="SELL"%}
+                        <button class="button is-danger">SELL</button>
+                    {%elif info["rsi"]["signal"]=="STAY"%}
+                        <button class="button is-warning">STAY</button>
                     {%endif%}
                 </div>
             </div>
