@@ -11,6 +11,7 @@ model=spacy.load("en_core_web_md")
 data_folder=os.getcwd()+"/static/historical/"
 allcompany=os.getcwd()+"/static/DB/allcompany_withnames.json"
 nse = Nse()
+
 def get_company_name(details):
     details=details.split(".")[0]
     doc=model(details)
@@ -19,6 +20,7 @@ def get_company_name(details):
             return ent.text
     upto_provide=details.index("provides")
     return details[:upto_provide]
+
 def historical(ticker,save=True,reload=False):
     today = datetime.now().date()
     filename = ticker + "_" + str(today) + ".csv"
@@ -33,11 +35,13 @@ def historical(ticker,save=True,reload=False):
                     os.makedirs(data_folder)
                 except Exception as e:
                     os.mkdir(data_folder)
-
+            hist=hist.fillna(method="ffill")
             hist.to_csv(data_folder+filename)
             hist = pd.read_csv(data_folder + filename)
+            hist=hist.fillna(method="ffill")
     else:
         hist=pd.read_csv(data_folder+filename)
+        hist=hist.fillna(method="ffill")
     return hist
 
 
@@ -52,24 +56,20 @@ def profit(buy,sell,qty=1):
     return round((((sell*qty)-(buy*qty))/(buy*qty))*100,2)
 
 
-def save_All_StockCodes():
-    all_stock_codes = nse.get_stock_codes()
-    stock = list(all_stock_codes.keys())
-    sector_wise_list = {}
-    exceptions = []
-    for i in stock[1:]:
-        print(i)
+def lastOpenPrice(row):
+    #print(row)
+    print(row)
+    quote_data=None
+    try:
+        quote_data = nse.get_quote(row.strip(".NS"))
+    except:
+        pass
+
+    if quote_data!=None:
         try:
-            info=company_info(i + ".NS")
-            sector =info["sector"]
-            company_name = info["longBusinessSummary"]
-            info["companyName"] = get_company_name(company_name)
-            company_name=info["companyName"]
-            if sector in sector_wise_list:
-                sector_wise_list[sector].append({"ticker":i + ".NS","company":company_name,"indus":sector})
-            else:
-                sector_wise_list[sector] = [{"ticker":i + ".NS","company":company_name,"indus":sector}]
-        except:
-            print("Error", i)
-            exceptions.append(i)
-    DB.insert(allcompany, sector_wise_list)
+            lastPrice = quote_data["lastPrice"]
+            openPrice = quote_data["open"]
+            return openPrice,lastPrice,profit(openPrice,lastPrice)
+        except :
+            return "-", "-", "-"
+    return "-","-","-"

@@ -3,19 +3,30 @@ from scripts import viz
 from scripts import DB
 from scripts import indicators
 from scripts import signals
-from flask import Flask,render_template,request,redirect,url_for
+from flask import Flask,render_template,request,redirect,url_for,session
 import os
 from nsetools import Nse
+import pandas as pd
 
 
 app=Flask(__name__)
-
+app.secret_key="indresh2neel"
 portfolio=os.getcwd()+"/static/DB/portfolio.json"
 allcompany=os.getcwd()+"/static/DB/allcompany_withnames.json"
+buckets=os.getcwd()+"/static/DB/bucket.json"
 nse = Nse()
+mongo=DB.MongoDB()
 #fetch.save_All_StockCodes()
+
+
+def destroy_session():
+    session.pop('industry', None)
+    session.pop('price', None)
+
+
 @app.route("/",methods=["GET","POST"])
 def index():
+    destroy_session()
     all_portfolio=DB.get_all(portfolio)
     current_prices={}
     losers=nse.get_top_losers()
@@ -34,12 +45,9 @@ def index():
         current_prices[stock["ticker"]] =info
     return render_template("dashboard.html",stocks=all_portfolio,prices=current_prices,losers=[losers[:5],losers[5:]],gainers=[gainers[:5],gainers[5:]])
 
-
-
-
-
 @app.route("/company/<name>")
 def company(name):
+    destroy_session()
     timeframe = 30
     hist = fetch.historical(name, save=True, reload=False)
     #bollinderBands
@@ -126,6 +134,7 @@ def company(name):
 
 @app.route("/addPortfolio/",methods=["GET","POST"])
 def add_portfolio():
+    destroy_session()
     info={}
     name = ""
     show=False
@@ -150,39 +159,54 @@ def add_portfolio():
 @app.route("/showStocks/",methods=["GET","POST"])
 def showStocks():
 
-    company=DB.get_all(allcompany)[0]
-    details=[]
-    codes=[]
     page=1
+    perpage=20
     if "page" in request.args:
         page=int(request.args["page"])
-    perpage=20
-    c=0
-    for i in company:
-        #print(company[i])
-        codes.extend(company[i])
+    data=mongo.getAll()
 
-    #print(codes)
+    df=pd.DataFrame(data)
+    industry = list(df["sector"].unique())
+    if request.method == "POST":
+        filin=request.form["industry"]
+        filprice=request.form["price"]
+        if filin!="Select Industry":
+            #df=df.loc[df["sector"]==filin]
+            session["sector"] =filin
+        if filprice != "Select Price":
+            #df.loc[df["previousClose"] <= int(filprice.strip("<"))]
+            session["price"] = filprice
+    print(session)
+    if "price" in session:
+        df = df.loc[df["previousClose"] <= int(session["price"].strip("<"))]
+    if "sector" in session:
+        df = df.loc[df["sector"] == session["sector"]]
 
-    for i in codes[(page-1)*perpage:page*perpage]:
-        try:
-            data=nse.get_quote(i["ticker"].strip(".NS"))
-        except:
-            continue
-        if data ==None:
-            continue
-        i["price"]=data["lastPrice"]
-        i["change"] = data["change"]
-        details.append(i)
-    print(details)
-    info={"current":page,"next":page+1,"prev":page-1,"last":int(len(codes)/perpage)+1}
-    return render_template("showStocks.html",company=details,info=info)
+    data = list(df.T.to_dict().values())
+    lastPage = int(len(data) / perpage)
+    
+    buckets_value=[i*100 for i in range(1,100)]
+    data=data[(page-1)*perpage:page*perpage]
+    fdata=[]
+    for i in data:
+        openP,lastP,pro=fetch.lastOpenPrice(i["ticker"])
+        i["price"]=lastP
+        i["open"]=openP
+        i["change"]=pro
+        fdata.append(i)
+    info={"current":page,"next":page+1,"prev":page-1,"last":lastPage}
+    return render_template("showStocks.html",
+                           company=fdata,
+                           info=info,
+                           items=industry,
+                           buckets_data=buckets_value)
 
 
 
 
 @app.route("/saveOrder/",methods=["GET","POST"])
 def save_order():
+    destroy_session()
     DB.insert(portfolio,{"ticker":request.args["ticker"],
                          "amount":request.args["amount"],
                          "qty":request.args["qty"],
@@ -193,4 +217,4 @@ def save_order():
 #hist_data=fetch.historical("PNB.NS")
 #viz.plot_stock(hist_data["Close"])
 
-app.run()
+app.run(debug=True)

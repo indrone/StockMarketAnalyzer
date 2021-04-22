@@ -1,22 +1,33 @@
 {% extends "header.html" %}
 {% block body %}
 <section style="padding:5% 5% 5% 5%">
-    <div class="columns">
-        <div class="column">
-            <div class="select">
-              <select>
-                <option>Select dropdown</option>
-                <option>With options</option>
-              </select>
+    <form action="" method="post" style="margin:10px">
+        <div class="columns">
+            <div class="column">
+                <div class="select">
+                  <select name="industry">
+                    <option>Select Industry</option>
+                    {%for i in items%}
+                      <option>{{i}}</option>
+                      {%endfor%}
+                  </select>
+                </div>
+            </div>
+            <div class="column">
+                <div class="select">
+                  <select name="price">
+                    <option>Select Price</option>
+                    {%for i in buckets_data%}
+                      <option><{{i}}</option>
+                      {%endfor%}
+                  </select>
+                </div>
+            </div>
+            <div class="column">
+                <button class="button is-primary">Filter</button>
             </div>
         </div>
-        <div class="column">
-
-        </div>
-        <div class="column">
-
-        </div>
-    </div>
+    </form>
     <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
     <thead>
     <tr>
@@ -29,10 +40,10 @@
         <tbody>
         {% for i in company%}
             <tr>
-                <td> <a href="/addPortfolio/?ticker={{i['ticker']}}">{{i["company"]}}</a></td>
-                <td> {{i["indus"]}}</td>
+                <td> <a href="/addPortfolio/?ticker={{i['ticker']}}">{{i["name"]}}</a></td>
+                <td> {{i["sector"]}}</td>
                 <td> {{i["price"]}} </td>
-                <td> {{i["change"]}} </td>
+                <td> {{i["change"]}} % </td>
             </tr>
         {% endfor%}
 
